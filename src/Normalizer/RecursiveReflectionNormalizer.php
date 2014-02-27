@@ -29,16 +29,75 @@ class RecursiveReflectionNormalizer extends NormalizerSet implements NormalizerA
         $reflection = new ReflectionObject($object);
 
         foreach ($reflection->getProperties() as $property) {
-            if ($property->isPrivate()) {
-                continue;
-            }
-
             $property->setAccessible(true);
 
             $normalized[$property->getName()] = $this->normalizeValue($property->getValue($object));
         }
 
         return $normalized;
+    }
+
+    public function denormalize($data, $type, $format = null, array $context = array())
+    {
+        $prototype = $this->createPrototype($type);
+        $reflection = new ReflectionObject($prototype);
+
+        foreach ($reflection->getProperties() as $property) {
+            if (false == isset($data[$property->getName()])) {
+                continue;
+            }
+
+            $property->setAccessible(true);
+            $property->setValue($prototype, $this->denormalizeValue($data[$property->getName()]));
+        }
+
+        return $prototype;
+    }
+
+    private function denormalizeValue($data)
+    {
+        switch (true) {
+            case is_scalar($data):
+                return $data;
+
+            case $normalizer = $this->getDenormalizer($data, 'array'):
+                return $normalizer->denormalize($data, 'array');
+
+            case $this->normalizer && $this->normalizer->supportsDenormalization($data, 'array'):
+                return $this->normalizer->denormalize($data, 'array');
+
+            case is_array($data):
+                return $this->denormalizeValues($data);
+
+            default: // we just assume you want an array
+                return $data;
+        }
+    }
+
+    private function denormalizeValues($data)
+    {
+        $denormalized = array();
+
+        foreach ($data as $key => $value) {
+            $denormalized[$key] = $this->denormalizeValue($value);
+        }
+
+        return $denormalized;
+    }
+
+    public function setNormalizer($normalizer)
+    {
+        $this->normalizer = $normalizer;
+    }
+
+    public function supportsNormalization($data, $format = null)
+    {
+        return is_object($data);
+    }
+
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        return is_array($data) && class_exists($type);
     }
 
     private function normalizeValue($data)
@@ -69,27 +128,8 @@ class RecursiveReflectionNormalizer extends NormalizerSet implements NormalizerA
         return $normalized;
     }
 
-    public function denormalize($data, $type, $format = null, array $context = array())
-    {
-    }
-
-    public function setNormalizer($normalizer)
-    {
-        $this->normalizer = $normalizer;
-    }
-
-    public function supportsNormalization($data, $format = null)
-    {
-        return is_object($data);
-    }
-
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return is_array($data) && class_exists($type);
-    }
-
     private function createPrototype($class)
     {
-        return unserialize(sprintf('O:%u:"%s":0:{}', strlen($className), $className));
+        return unserialize(sprintf('O:%u:"%s":0:{}', strlen($class), $class));
     }
 }

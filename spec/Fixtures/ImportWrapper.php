@@ -10,4 +10,9 @@ class ImportWrapper
     {
         $this->import = $import;
     }
+
+    public function getImport()
+    {
+        return $this->import;
+    }
 }

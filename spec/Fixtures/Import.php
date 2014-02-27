@@ -9,4 +9,14 @@ class Import
         'name' => 'RussianUsers',
         'file' => 's3://bucket/users.csv',
     );
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
 }
