@@ -4,6 +4,8 @@ Normalt
 Normalt is a extension to Symfony Serializer than implements only the Normalization part. It comes with several
 different Normalizers that can be used to normalize from object to array and denormalize from array to object.
 
+That is the overall goal anyways.
+
 Normalizers
 -----------
 
