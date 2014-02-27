@@ -1,0 +1,12 @@
+{
+    "name" : "bernard/normalt",
+    "license" : "MIT",
+
+    "autoload" : {
+        "psr-4" : { "Normalt\\" : "src" }
+    },
+
+    "require" : {
+        "symfony/serializer" : ">=2.3,<=3.0"
+    }
+}
