@@ -60,18 +60,30 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
     private function getNormalizer($data, $format = null)
     {
         foreach ($this->normalizers as $normalizer) {
-            if ($normalizer->supportsNormalization($data, $format)) {
-                return $normalizer;
+            if (false == $normalizer->supportsNormalization($data, $format)) {
+                continue;
             }
+
+            if ($normalizer instanceof NormalizerAware) {
+                $normalizer->setNormalizer($this);
+            }
+
+            return $normalizer;
         }
     }
 
     private function getDenormalizer($data, $type, $format = null)
     {
         foreach ($this->denormalizers as $normalizer) {
-            if ($normalizer->supportsDenormalization($data, $type, $format)) {
-                return $normalizer;
+            if (false == $normalizer->supportsDenormalization($data, $type, $format)) {
+                continue;
             }
+
+            if ($normalizer instanceof NormalizerAware) {
+                $normalizer->setNormalizer($this);
+            }
+
+            return $normalizer;
         }
     }
 }
