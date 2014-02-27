@@ -30,11 +30,27 @@ Any normalizer that is used through the `NormalizerSet` will have an instance of
 if they implement `Normalt\NormalizerAware`. Same as if you have a Normalizer that implements
 `SerializerAwareInterface` and use the Serializer.
 
-Included Normalizers
---------------------
+Property Normalizer's
+---------------------
 
-Other than the normalt normalizers from the serializer component we have added some more special
-ones that can be used. Theese can be used with the normal Serializer aswell.
+There is a special normalizer included that act as a collection of `PropertyNormalizer`'s. This is a seperate
+interface which is used to normalize the properties of a object one-by-one, just like a visitor pattern.
 
-* `PropertyNormalizer` which uses reflection and an additional array of serializers that get each property name, and value
-  as a seperate normalization.
+If the normalizer cannot find any property normalizers it will just assume that value should not be normalized.
+If that value is an object it will fallback to the normal `NormalizerSet` and save its class name in a special
+key named `__class__`.
+
+``` php
+
+use Normalt\Normalizer\PropertyVisitationNormalizer;
+use Normalt\PropertyNormalizer\DoctrinePropertyNormalizer;
+
+$visitationNormalizer = new PropertyVisitationNormalizer(array(
+    new DoctrinePropertyNormalizer($objectManager),
+));
+
+// this would return ['identifier' => 1, 'objectName' => 'MyModel']
+// the identifier is used in a find call on the object manager.
+$visitationNormalizer->normalize(new MyModel);
+```
+
