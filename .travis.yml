@@ -1,0 +1,15 @@
+language: php
+
+php:
+    - 5.3
+    - 5.4
+    - 5.5
+    - 5.6
+    - hhvm
+
+before_script:
+    - "composer require --dev phpspec/phpspec:~2.0.0-RC4 --no-update"
+    - "composer install --no-progress --no-plugins"
+
+script:
+    - php vendor/bin/phpspec run
