@@ -21,6 +21,9 @@ $set = new NormalizerSet(array(
     new GetSetMethodNormalizer,
     new CustomNormalizer,
 ));
+
+$normalized = $set->normalize(new MyObject);
+$object = $set->denormalize($normalized);
 ```
 
 Included Normalizers
