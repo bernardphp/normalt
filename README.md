@@ -26,6 +26,10 @@ $normalized = $set->normalize(new MyObject);
 $object = $set->denormalize($normalized);
 ```
 
+Any normalizer that is used through the `NormalizerSet` will have an instance of it set
+if they implement `Normalt\NormalizerAware`. Same as if you have a Normalizer that implements
+`SerializerAwareInterface` and use the Serializer.
+
 Included Normalizers
 --------------------
 
