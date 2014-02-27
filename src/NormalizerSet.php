@@ -14,8 +14,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 class NormalizerSet implements NormalizerInterface, DenormalizerInterface
 {
-    private $normalizers = array();
-    private $denormalizers = array();
+    protected $normalizers = array();
+    protected $denormalizers = array();
 
     public function __construct($normalizers = array())
     {
@@ -27,6 +27,8 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
         if ($normalizer = $this->getNormalizer($object, $format)) {
             return $normalizer->normalize($object, $format, $context);
         }
+
+        throw new UnexpectedValueException('No supported normalizer found for "' . get_class($object) . '".');
     }
 
     public function denormalize($data, $class, $format = null, array $context = array())
@@ -34,6 +36,8 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
         if ($denormalizer = $this->getDenormalizer($data, $class, $format)) {
             return $denormalizer->denormalize($data, $class, $format, $context);
         }
+
+        throw new UnexpectedValueException('No supported normalizer found for "' . $class . '".');
     }
 
     public function supportsNormalization($data, $format = null)
@@ -46,7 +50,7 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
         return (boolean) $this->getDenormalizer($data, $type, $format);
     }
 
-    private function getNormalizer($data, $format = null)
+    protected function getNormalizer($data, $format = null)
     {
         foreach ($this->normalizers as $normalizer) {
             if (false == $normalizer->supportsNormalization($data, $format)) {
@@ -61,7 +65,7 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
         }
     }
 
-    private function getDenormalizer($data, $type, $format = null)
+    protected function getDenormalizer($data, $type, $format = null)
     {
         foreach ($this->denormalizers as $normalizer) {
             if (false == $normalizer->supportsDenormalization($data, $type, $format)) {
@@ -76,7 +80,7 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
         }
     }
 
-    private function add($normalizer)
+    protected function add($normalizer)
     {
         if ($normalizer instanceof NormalizerInterface) {
             $this->normalizers[] = $normalizer;
