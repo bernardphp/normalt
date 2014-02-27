@@ -22,17 +22,6 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
         array_map(array($this, 'add'), $normalizers);
     }
 
-    public function add($normalizer)
-    {
-        if ($normalizer instanceof NormalizerInterface) {
-            $this->normalizers[] = $normalizer;
-        }
-
-        if ($normalizer instanceof DenormalizerInterface) {
-            $this->denormalizers[] = $normalizer;
-        }
-    }
-
     public function normalize($object, $format = null, array $context = array())
     {
         if ($normalizer = $this->getNormalizer($object, $format)) {
@@ -86,4 +75,16 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
             return $normalizer;
         }
     }
+
+    private function add($normalizer)
+    {
+        if ($normalizer instanceof NormalizerInterface) {
+            $this->normalizers[] = $normalizer;
+        }
+
+        if ($normalizer instanceof DenormalizerInterface) {
+            $this->denormalizers[] = $normalizer;
+        }
+    }
+
 }
