@@ -54,37 +54,6 @@ class RecursiveReflectionNormalizer extends NormalizerSet implements NormalizerA
         return $prototype;
     }
 
-    private function denormalizeValue($data)
-    {
-        switch (true) {
-            case is_scalar($data):
-                return $data;
-
-            case $normalizer = $this->getDenormalizer($data, 'array'):
-                return $normalizer->denormalize($data, 'array');
-
-            case $this->normalizer && $this->normalizer->supportsDenormalization($data, 'array'):
-                return $this->normalizer->denormalize($data, 'array');
-
-            case is_array($data):
-                return $this->denormalizeValues($data);
-
-            default: // we just assume you want an array
-                return $data;
-        }
-    }
-
-    private function denormalizeValues($data)
-    {
-        $denormalized = array();
-
-        foreach ($data as $key => $value) {
-            $denormalized[$key] = $this->denormalizeValue($value);
-        }
-
-        return $denormalized;
-    }
-
     public function setNormalizer($normalizer)
     {
         $this->normalizer = $normalizer;
@@ -127,6 +96,38 @@ class RecursiveReflectionNormalizer extends NormalizerSet implements NormalizerA
 
         return $normalized;
     }
+
+    private function denormalizeValue($data)
+    {
+        switch (true) {
+            case is_scalar($data):
+                return $data;
+
+            case $normalizer = $this->getDenormalizer($data, 'array'):
+                return $normalizer->denormalize($data, 'array');
+
+            case $this->normalizer && $this->normalizer->supportsDenormalization($data, 'array'):
+                return $this->normalizer->denormalize($data, 'array');
+
+            case is_array($data):
+                return $this->denormalizeValues($data);
+
+            default: // we just assume you want an array
+                return $data;
+        }
+    }
+
+    private function denormalizeValues($data)
+    {
+        $denormalized = array();
+
+        foreach ($data as $key => $value) {
+            $denormalized[$key] = $this->denormalizeValue($value);
+        }
+
+        return $denormalized;
+    }
+
 
     private function createPrototype($class)
     {
