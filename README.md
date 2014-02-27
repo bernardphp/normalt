@@ -54,3 +54,19 @@ $visitationNormalizer = new PropertyVisitationNormalizer(array(
 $visitationNormalizer->normalize(new MyModel);
 ```
 
+Naming Suggestions
+------------------
+
+Because Normalizer is used in the Serializer and the PropertyNormalizer concepts it is very easy to get
+confused. So here is some suggestion for renaming the NormalizerSet.
+
+### Marshal
+
+> ...marshalling (sometimes spelled marshaling) is the process of transforming the memory representation of an
+> object to a data format suitable for storage or transmission, and it is typically used when data must be
+> moved between different parts of a computer program...
+
+seems like the concept match up to what we are doing here, if we look at array as a suitable representation
+for storage.
+
+This would name the NormalizerSet `Marshaller` (like in Java) and leave the PropertyNormalizer be.
