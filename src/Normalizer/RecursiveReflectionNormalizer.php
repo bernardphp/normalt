@@ -106,14 +106,11 @@ class RecursiveReflectionNormalizer extends NormalizerSet implements NormalizerA
             case $normalizer = $this->getDenormalizer($data, 'array'):
                 return $normalizer->denormalize($data, 'array');
 
-            case $this->normalizer && $this->normalizer->supportsDenormalization($data, 'array'):
+            case $this->normalizer->supportsDenormalization($data, 'array'):
                 return $this->normalizer->denormalize($data, 'array');
 
             case is_array($data):
                 return $this->denormalizeValues($data);
-
-            default: // we just assume you want an array
-                return $data;
         }
     }
 

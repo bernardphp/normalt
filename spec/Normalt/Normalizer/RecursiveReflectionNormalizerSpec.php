@@ -90,7 +90,10 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
         ));
     }
 
-    function it_denormalizes_into_object()
+    /**
+     * @param Symfony\Component\Serializer\Normalizer\DenormalizerInterface $normalizer
+     */
+    function it_denormalizes_into_object($normalizer)
     {
         $data = array(
             'id' => 10,
@@ -98,6 +101,8 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
                 'name' => 'BelgianUsers',
             ),
         );
+
+        $this->setNormalizer($normalizer);
 
         $import = $this->denormalize($data, 'Fixtures\Import');
 
@@ -110,9 +115,10 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
 
     /**
      * @param Symfony\Component\Serializer\Normalizer\DenormalizerInterface $normalizer
+     * @param Symfony\Component\Serializer\Normalizer\DenormalizerInterface $fallback
      * @param Fixtures\Import $import
      */
-    function it_denormalizes_complex_object($normalizer, $import)
+    function it_denormalizes_complex_object($normalizer, $fallback, $import)
     {
         $data = array(
             'import' => array(
@@ -125,6 +131,7 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
         $normalizer->denormalize($data['import'], 'array', null)->willReturn($import);
 
         $this->beConstructedWith(array($normalizer));
+        $this->setNormalizer($fallback);
 
         $wrapper = $this->denormalize($data, 'Fixtures\ImportWrapper');
         $wrapper->shouldBeAnInstanceOf('Fixtures\ImportWrapper');
