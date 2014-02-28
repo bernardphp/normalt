@@ -13,7 +13,7 @@ use UnexpectedValueException;
  *
  * @package Normalt
  */
-class NormalizerSet implements NormalizerInterface, DenormalizerInterface
+class Marshaller implements NormalizerInterface, DenormalizerInterface
 {
     protected $normalizers = array();
     protected $denormalizers = array();
@@ -58,8 +58,8 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
                 continue;
             }
 
-            if ($normalizer instanceof NormalizerAware) {
-                $normalizer->setNormalizer($this);
+            if ($normalizer instanceof MarshallerAware) {
+                $normalizer->setMarshaller($this);
             }
 
             return $normalizer;
@@ -73,8 +73,8 @@ class NormalizerSet implements NormalizerInterface, DenormalizerInterface
                 continue;
             }
 
-            if ($normalizer instanceof NormalizerAware) {
-                $normalizer->setNormalizer($this);
+            if ($normalizer instanceof MarshallerAware) {
+                $normalizer->setMarshaller($this);
             }
 
             return $normalizer;
