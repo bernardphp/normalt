@@ -4,6 +4,7 @@ namespace Normalt;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use UnexpectedValueException;
 
 /**
  * Functionality extracted from Symfony\Component\Serializer\Serializer in order to

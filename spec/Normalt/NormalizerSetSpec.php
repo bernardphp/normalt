@@ -19,9 +19,13 @@ class NormalizerSetSpec extends ObjectBehavior
         $this->beConstructedWith(array($unsupported, $supported));
     }
 
-    function it_is_initializable()
+    /**
+     * @param stdClass $std
+     */
+    function it_throws_exception_when_no_normalizer_is_found($std)
     {
-        $this->shouldHaveType('Normalt\NormalizerSet');
+        $this->shouldThrow('UnexpectedValueException')->duringNormalize($std);
+        $this->shouldThrow('UnexpectedValueException')->duringDenormalize(array(), 'stdClass');
     }
 
     function it_implements_normalizer_and_denormalizer()
