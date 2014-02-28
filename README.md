@@ -4,8 +4,6 @@ Normalt
 Normalt is a extension to Symfony Serializer than implements only the Normalization part. It comes with several
 different Normalizers that can be used to normalize from object to array and denormalize from array to object.
 
-That is the overall goal anyways.
-
 Getting Started
 ---------------
 
@@ -30,28 +28,40 @@ Any normalizer that is used through the `NormalizerSet` will have an instance of
 if they implement `Normalt\NormalizerAware`. Same as if you have a Normalizer that implements
 `SerializerAwareInterface` and use the Serializer.
 
-Property Normalizer's
----------------------
+RecursiveReflectionNormalizer
+-----------------------------
 
-There is a special normalizer included that act as a collection of `PropertyNormalizer`'s. This is a seperate
-interface which is used to normalize the properties of a object one-by-one, just like a visitor pattern.
+It is a special normalizer that uses a list of normalizers, but instead of applying on an per object basis it
+traverses the properties and applies normalization to each. If a property contains an array this is also traversed.
 
-If the normalizer cannot find any property normalizers it will just assume that value should not be normalized.
-If that value is an object it will fallback to the normal `NormalizerSet` and save its class name in a special
-key named `__class__`.
+This can be used together with `DoctrineNormalizer` to automatically convert from Entity to array and back again.
+
 
 ``` php
 
-use Normalt\Normalizer\PropertyVisitationNormalizer;
-use Normalt\PropertyNormalizer\DoctrinePropertyNormalizer;
+use Normalt\Normalizer\RecursiveReflectionNormalizer;
+use Normalt\Normalizer\DoctrineNormalizer;
 
-$visitationNormalizer = new PropertyVisitationNormalizer(array(
-    new DoctrinePropertyNormalizer($objectManager),
+$normalizer = new RecursiveReflectionNormalizer(array(
+    new DoctrineNormalizer($objectManager),
 ));
 
-// this would return ['identifier' => 1, 'objectName' => 'MyModel']
-// the identifier is used in a find call on the object manager.
-$visitationNormalizer->normalize(new MyModel);
+
+// Assuming this wraps an entity called MyModel.
+// we would get the following array when normalized (assuming its identifier is 1
+// array(
+//    'model' => array('className' => 'MyModel', 1),
+// )
+class MyModelWrapper {
+    protected $model;
+
+    public function __construct()
+    {
+        $this->model = new MyModel;
+    }
+}
+
+$normalizer->normalize(new MyModelWrapper);
 ```
 
 Naming Suggestions
