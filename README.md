@@ -3,67 +3,145 @@ Normalt
 
 [![Build Status](https://travis-ci.org/bernardphp/normalt.png?branch=master)](https://travis-ci.org/bernardphp/normalt)
 
-Normalt is a extension to Symfony Serializer than implements only the Normalization part. It comes with several
-different Normalizers that can be used to normalize from object to array and denormalize from array to object.
+Normalt contains additional normalizer's for use with the serializer component found in Symfony. It also
+implements a normalizer delegator that will look at the data you want normalized and/or denormalized
+and call the normalizer which supports it.
 
-The main interaction is the Marshaller. This is a implementation of `DenormalizerInterface` and `NormalizerInterface`.
+In the context of Normalt normalization is the act of converting an object into an array. Denormalization
+is the opposite direction (converting array into an object). This is to my knowledge the same concept
+Symfony serializer uses.
+
+Table of Contents
+-----------------
+
+ * [Getting Started](#getting-started)
+ * [Marshaller](#marshaller)
+ * [Normalizers](#normalizers)
+   * [DoctrineNormalizer](#doctrinenormalizer)
+   * [RecursiveReflectionNormalizer](#recursivereflectionnormalizer)
+ * [License](#license)
+
 
 Getting Started
 ---------------
 
-Each normalizer can be used on its own, but you can also use a `NormalizerSet` to use many different dependent on
-the type you are normalizing, just like when using the serializer.
+Getting started is as easy as requiring the library with composer.
+
+``` bash
+$ composer require bernard/normalt:~0.1
+```
+
+Marshaller
+----------
+
+The Marshaller is a delegator, it have a list of normalizers and denormalizers. It will ask each
+of theese if they support the data/object and use the first found.
+
+It implements a subset of the full serializer and its only focus is normalizing to arrays and
+denormalize arrays into objects. This lets you focus on normalization instead of converting
+into a specific format such as `xml`, `json` etc.
+
+### Usage
+
+You need to instantiate the Marshaller and the normalizer/denormalizers you want to use.
+For this example we use `GetSetMethodNormalizer` which is distributed with the symfony package.
+
+This is the class we are going to use. `GetSetMethodNormalizer` uses getters and setters to do
+its job.
+
+```
+class User
+{
+    protected $name;
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+}
+```
+
+Lets normalize and denormalize it again.
 
 ``` php
 use Normalt\Marshaller;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
 
-$set = new Marshaller(array(
-    new GetSetMethodNormalizer,
-    new CustomNormalizer,
-));
+$marshaller = new Marshaller([new GetSetMethodNormalizer]);
 
-$normalized = $set->normalize(new MyObject);
-$object = $set->denormalize($normalized);
+$user = new User;
+$user->setName('henrik');
+
+$array = $marshaller->normalize($user);
+
+// $array now contains ['name' => 'henrik']
+
+$user = $marshaller->denormalize($array, 'User');
+echo $user->getName(); // outputs Henrik
 ```
 
-Any normalizer that is used through the `Marshaller` will have an instance of it set
-if they implement `Normalt\MarshallerAware`. Same as if you have a Normalizer that implements
-`SerializerAwareInterface` and use the Serializer.
+Normalizers
+-----------
 
-RecursiveReflectionNormalizer
------------------------------
+Theese normalizers can be used with the serializer component directly or through the Marshaller.
 
-It is a special normalizer that uses a list of normalizers, but instead of applying on an per object basis it
-traverses the properties and applies normalization to each. If a property contains an array this is also traversed.
+### DoctrineNormalizer
 
-This can be used together with `DoctrineNormalizer` to automatically convert from Entity to array and back again.
+`DoctrineNormalizer` normalizes mapped objects (Entities, Documents etc.) into arrays and back again.
+It can be used with the Marshaller or on its own.
 
+It usage is very simple. The following example assume a mapped object of `$user` and that you are
+using the doctrine orm (other doctrine projects work aswell!).
 
 ``` php
+use Doctrine\ORM\EntityManager;
+use Normalt\Normalizer\DoctrineNormalizer;
 
+// create $entityManager
+$normalizer = new DoctrineNormalizer($entityManager);
+
+// assuming $user is a mapped object and have the identifier value of 10. the following will return
+// array('MyModel\User', 10)
+$array = $normalizer->normalize($user);
+
+// using the same structure you can convert it back into a user
+$user = $normalizer->denormalize($array, null);
+```
+
+### RecursiveReflectionNormalizer
+
+This normalizes also delegates like the Marshaller, but delegates for each property in the object you want
+to normalize. It does this with recursion, so if a normalizer does not support a given property and is an
+array it will loop through that array and look for more objects.
+
+The same thing happens when denormalizing, except it will try and find a supporting denormalizer for the
+property structure before looping.
+
+Using is simple as the other, the example utilises `DoctrineNormalizer` and assumes we have a `$profile` object
+that contains a reference to a user with `$profile->user`.
+
+``` php
 use Normalt\Normalizer\RecursiveReflectionNormalizer;
 use Normalt\Normalizer\DoctrineNormalizer;
 
-$normalizer = new RecursiveReflectionNormalizer(array(
-    new DoctrineNormalizer($objectManager),
-));
+$normalizer = new RecursiveReflectionNormalizer([new DoctrineNormalizer($entityManager)]);
 
+// following will return assuming User is mapped and has the identifier of 10
+//['user' => ['MyModel\User', 10]]
+$array = $normalizer->normalize($profile);
 
-// Assuming this wraps an entity called MyModel.
-// we would get the following array when normalized (assuming its identifier is 1
-// array(
-//    'model' => array('className' => 'MyModel', 1),
-// )
-class MyModelWrapper {
-    protected $model;
-
-    public function __construct()
-    {
-        $this->model = new MyModel;
-    }
-}
-
-$normalizer->normalize(new MyModelWrapper);
+// converting it back into the object.
+// $profile->user is now an instance of MyModel\User
+$profile = $normalize->denormalize($array, 'MyModel\Profile');
 ```
+
+License
+-------
+
+Please refer to the included `LICENSE` file.
+
