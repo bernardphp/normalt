@@ -29,7 +29,7 @@ Getting started is as easy as requiring the library with composer.
 
 ``` bash
 $ composer require bernard/normalt:~0.1
-
+```
 
 Normalizers
 -----------
