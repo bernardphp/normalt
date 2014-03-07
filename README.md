@@ -56,7 +56,7 @@ For this example we use `GetSetMethodNormalizer` which is distributed with the s
 This is the class we are going to use. `GetSetMethodNormalizer` uses getters and setters to do
 its job.
 
-```
+``` php
 class User
 {
     protected $name;
