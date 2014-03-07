@@ -1,6 +1,6 @@
 <?php
 
-namespace Normalt;
+namespace Normalt\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -13,7 +13,7 @@ use UnexpectedValueException;
  *
  * @package Normalt
  */
-class Marshaller implements NormalizerInterface, DenormalizerInterface
+class AggregateNormalizer implements NormalizerInterface, DenormalizerInterface
 {
     protected $normalizers = array();
     protected $denormalizers = array();
@@ -58,8 +58,8 @@ class Marshaller implements NormalizerInterface, DenormalizerInterface
                 continue;
             }
 
-            if ($normalizer instanceof MarshallerAware) {
-                $normalizer->setMarshaller($this);
+            if ($normalizer instanceof AggregateNormalizerAware) {
+                $normalizer->setAggregateNormalizer($this);
             }
 
             return $normalizer;
@@ -68,16 +68,16 @@ class Marshaller implements NormalizerInterface, DenormalizerInterface
 
     protected function getDenormalizer($data, $type, $format = null)
     {
-        foreach ($this->denormalizers as $normalizer) {
-            if (false == $normalizer->supportsDenormalization($data, $type, $format)) {
+        foreach ($this->denormalizers as $denormalizer) {
+            if (false == $denormalizer->supportsDenormalization($data, $type, $format)) {
                 continue;
             }
 
-            if ($normalizer instanceof MarshallerAware) {
-                $normalizer->setMarshaller($this);
+            if ($denormalizer instanceof AggregateNormalizerAware) {
+                $denormalizer->setAggregateNormalizer($this);
             }
 
-            return $normalizer;
+            return $denormalizer;
         }
     }
 

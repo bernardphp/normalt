@@ -2,8 +2,6 @@
 
 namespace Normalt\Normalizer;
 
-use Normalt\Marshaller;
-use Normalt\MarshallerAware;
 use ReflectionObject;
 
 /**
@@ -19,7 +17,7 @@ use ReflectionObject;
  *
  * @package Normalt
  */
-class RecursiveReflectionNormalizer extends Marshaller implements MarshallerAware
+class RecursiveReflectionNormalizer extends AggregateNormalizer implements AggregateNormalizerAware
 {
     protected $normalizer;
 
@@ -54,9 +52,9 @@ class RecursiveReflectionNormalizer extends Marshaller implements MarshallerAwar
         return $prototype;
     }
 
-    public function setMarshaller(Marshaller $marshaller)
+    public function setAggregateNormalizer(AggregateNormalizer $aggregate)
     {
-        $this->marshaller = $marshaller;
+        $this->aggregate = $aggregate;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -82,7 +80,7 @@ class RecursiveReflectionNormalizer extends Marshaller implements MarshallerAwar
                 return $normalizer->normalize($data);
 
             default:
-                return $this->marshaller->normalize($data);
+                return $this->aggregate->normalize($data);
         }
     }
 
@@ -106,8 +104,8 @@ class RecursiveReflectionNormalizer extends Marshaller implements MarshallerAwar
             case $normalizer = $this->getDenormalizer($data, 'array'):
                 return $normalizer->denormalize($data, 'array');
 
-            case $this->marshaller->supportsDenormalization($data, 'array'):
-                return $this->marshaller->denormalize($data, 'array');
+            case $this->aggregate->supportsDenormalization($data, 'array'):
+                return $this->aggregate->denormalize($data, 'array');
 
             case is_array($data):
                 return $this->denormalizeValues($data);

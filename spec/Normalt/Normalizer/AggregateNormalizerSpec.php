@@ -1,11 +1,11 @@
 <?php
 
-namespace spec\Normalt;
+namespace spec\Normalt\Normalizer;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class MarshallerSpec extends ObjectBehavior
+class AggregateNormalizerSpec extends ObjectBehavior
 {
     /**
      * @param Symfony\Component\Serializer\Normalizer\NormalizerInterface $unsupported
@@ -67,7 +67,7 @@ class MarshallerSpec extends ObjectBehavior
     }
 
     /**
-     * @param Normalt\MarshallerAware $normalizer
+     * @param Normalt\Normalizer\AggregateNormalizerAware $normalizer
      */
     function it_sets_itself_as_marshaller_if_marshaller_aware($normalizer)
     {
@@ -79,7 +79,7 @@ class MarshallerSpec extends ObjectBehavior
         $normalizer->supportsNormalization('data', null)->willReturn(true);
         $normalizer->supportsDenormalization('data', 'string', null)->willReturn(true);
 
-        $normalizer->setMarshaller($this)->shouldBeCalledTimes(2);
+        $normalizer->setAggregateNormalizer($this)->shouldBeCalledTimes(2);
 
         $normalizer->normalize('data', null, array())->willReturn();
         $normalizer->denormalize('data', 'string', null, array())->willReturn();

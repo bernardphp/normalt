@@ -15,7 +15,7 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
 
     function it_is_normalizer_aware()
     {
-        $this->shouldHaveType('Normalt\MarshallerAware');
+        $this->shouldHaveType('Normalt\Normalizer\AggregateNormalizerAware');
     }
 
     function it_is_normalizer_and_denormalizer()
@@ -49,17 +49,17 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
     }
 
     /**
-     * @param Normalt\Marshaller $marshaller
+     * @param Normalt\Normalizer\AggregateNormalizer $aggregate
      */
-    function it_delegates_to_marshaller_when_unknown_object_is_called($marshaller)
+    function it_delegates_to_marshaller_when_unknown_object_is_called($aggregate)
     {
-        $this->setMarshaller($marshaller);
+        $this->setAggregateNormalizer($aggregate);
 
         $import = new \Fixtures\Import;
         $wrapper = new \Fixtures\ImportWrapper($import);
 
-        $marshaller->supportsNormalization($import, null)->willReturn(true);
-        $marshaller->normalize($import, null)->shouldBeCalled()->willReturn(array(
+        $aggregate->supportsNormalization($import, null)->willReturn(true);
+        $aggregate->normalize($import, null)->shouldBeCalled()->willReturn(array(
             'id' => 1,
             'class' => 'Fixtures\\Import',
         ));
@@ -91,9 +91,9 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
     }
 
     /**
-     * @param Normalt\Marshaller $marshaller
+     * @param Normalt\Normalizer\AggregateNormalizer $aggregate
      */
-    function it_denormalizes_into_object($marshaller)
+    function it_denormalizes_into_object($aggregate)
     {
         $data = array(
             'id' => 10,
@@ -102,7 +102,7 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
             ),
         );
 
-        $this->setMarshaller($marshaller);
+        $this->setAggregateNormalizer($aggregate);
 
         $import = $this->denormalize($data, 'Fixtures\Import');
 
@@ -115,10 +115,10 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
 
     /**
      * @param Symfony\Component\Serializer\Normalizer\DenormalizerInterface $normalizer
-     * @param Normalt\Marshaller $marshaller
+     * @param Normalt\Normalizer\AggregateNormalizer $aggregate
      * @param Fixtures\Import $import
      */
-    function it_denormalizes_complex_object($normalizer, $marshaller, $import)
+    function it_denormalizes_complex_object($normalizer, $aggregate, $import)
     {
         $data = array(
             'import' => array(
@@ -131,7 +131,7 @@ class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
         $normalizer->denormalize($data['import'], 'array', null)->willReturn($import);
 
         $this->beConstructedWith(array($normalizer));
-        $this->setMarshaller($marshaller);
+        $this->setAggregateNormalizer($aggregate);
 
         $wrapper = $this->denormalize($data, 'Fixtures\ImportWrapper');
         $wrapper->shouldBeAnInstanceOf('Fixtures\ImportWrapper');
