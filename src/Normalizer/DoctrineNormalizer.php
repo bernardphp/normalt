@@ -52,6 +52,12 @@ class DoctrineNormalizer implements NormalizerInterface, DenormalizerInterface
 
     private function hasMetadataFor($class)
     {
-        return $this->objectManager->getMetadataFactory()->hasMetadataFor($class);
+        try {
+            $this->objectManager->getClassMetadata($class);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
