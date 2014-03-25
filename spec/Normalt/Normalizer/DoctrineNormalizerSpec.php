@@ -21,17 +21,26 @@ class DoctrineNormalizerSpec extends \PhpSpec\ObjectBehavior
     }
 
     /**
-     * @param Doctrine\Common\Persistence\Mapping\ClassMetadataFactory $metadataFactory
+     * @param Doctrine\Common\Persistence\Mapping\ClassMetadata $metadata
      */
-    function it_supports_object_that_have_metadata($metadataFactory, $manager)
+    function it_supports_object_that_have_metadata($metadata, $manager)
     {
-        $manager->getMetadataFactory()->willReturn($metadataFactory);
+        $manager->getClassMetadata('stdClass')->willReturn($metadata);
 
         $std = new stdClass;
-        $metadataFactory->hasMetadataFor('stdClass')->willReturn(true);
 
         $this->supportsNormalization($std)->shouldReturn(true);
         $this->supportsDenormalization(array('className' => 'stdClass'), 'stdClass')->shouldReturn(true);
+    }
+
+    function it_does_not_support_object_that_have_no_metadata($manager)
+    {
+        $manager->getClassMetadata('stdClass')->willThrow('Doctrine\Common\Persistence\Mapping\MappingException');
+
+        $std = new stdClass;
+
+        $this->supportsNormalization($std)->shouldReturn(false);
+        $this->supportsDenormalization(array('className' => 'stdClass'), 'stdClass')->shouldReturn(false);
     }
 
     /**
