@@ -2,10 +2,6 @@
 
 namespace spec\Normalt\Normalizer;
 
-// Fixtures
-require __DIR__ . '/../../Fixtures/Import.php';
-require __DIR__ . '/../../Fixtures/ImportWrapper.php';
-
 class RecursiveReflectionNormalizerSpec extends \PhpSpec\ObjectBehavior
 {
     function it_is_initializable()
