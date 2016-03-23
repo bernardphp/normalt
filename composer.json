@@ -11,7 +11,7 @@
     },
 
     "require" : {
-        "symfony/serializer" : "~2.3"
+        "symfony/serializer" : "~2.3 || ~3.0"
     },
 
     "require-dev" : {
