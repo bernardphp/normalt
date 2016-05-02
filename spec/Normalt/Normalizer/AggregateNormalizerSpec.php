@@ -87,4 +87,28 @@ class AggregateNormalizerSpec extends ObjectBehavior
         $this->normalize('data');
         $this->denormalize('data', 'string');
     }
+
+    function it_is_serializer_aware()
+    {
+        $this->shouldImplement('Symfony\Component\Serializer\SerializerAwareInterface');
+    }
+
+    /**
+     * @param Symfony\Component\Serializer\Normalizer\NormalizerInterface $normalizer
+     * @param Symfony\Component\Serializer\Normalizer\NormalizerInterface $denormaNormalizer
+     * @param Symfony\Component\Serializer\SerializerInterface $serializer
+     */
+    function it_sets_the_serializer_if_one_of_the_normalizers_is_serializer_aware($normalizer, $denormaNormalizer, $serializer)
+    {
+        $normalizer->implement('Symfony\Component\Serializer\SerializerAwareInterface');
+        $denormaNormalizer->implement('Symfony\Component\Serializer\SerializerAwareInterface');
+        $denormaNormalizer->implement('Symfony\Component\Serializer\Normalizer\DenormalizerInterface');
+
+        $normalizer->setSerializer($serializer)->shouldBeCalled();
+        $denormaNormalizer->setSerializer($serializer)->shouldBeCalledTimes(2);
+
+        $this->beConstructedWith(array($normalizer, $denormaNormalizer));
+
+        $this->setSerializer($serializer);
+    }
 }
