@@ -1,0 +1,4 @@
+suites:
+    normalt_suite:
+        namespace: Normalt
+formatter.name: pretty
