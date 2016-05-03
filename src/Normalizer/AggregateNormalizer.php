@@ -4,6 +4,8 @@ namespace Normalt\Normalizer;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 use UnexpectedValueException;
 
 /**
@@ -13,7 +15,7 @@ use UnexpectedValueException;
  *
  * @package Normalt
  */
-class AggregateNormalizer implements NormalizerInterface, DenormalizerInterface
+class AggregateNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     protected $normalizers = array();
     protected $denormalizers = array();
@@ -49,6 +51,21 @@ class AggregateNormalizer implements NormalizerInterface, DenormalizerInterface
     public function supportsDenormalization($data, $type, $format = null)
     {
         return (boolean) $this->getDenormalizer($data, $type, $format);
+    }
+
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        foreach ($this->normalizers as $normalizer) {
+            if ($normalizer instanceof SerializerAwareInterface) {
+                $normalizer->setSerializer($serializer);
+            }
+        }
+
+        foreach ($this->denormalizers as $normalizer) {
+            if ($normalizer instanceof SerializerAwareInterface) {
+                $normalizer->setSerializer($serializer);
+            }
+        }
     }
 
     protected function getNormalizer($data, $format = null)
