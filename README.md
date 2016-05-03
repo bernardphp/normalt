@@ -3,13 +3,14 @@ Normalt
 
 [![Build Status](https://travis-ci.org/bernardphp/normalt.png?branch=master)](https://travis-ci.org/bernardphp/normalt)
 
-Normalt contains additional normalizer's for use with the serializer component found in Symfony. It also
+Normalt contains additional normalizers for use with the serializer component found in Symfony. It also
 implements a normalizer delegator that will look at the data you want normalized and/or denormalized
 and call the normalizer which supports it.
 
 In the context of Normalt normalization is the act of converting an object into an array. Denormalization
 is the opposite direction (converting array into an object). This is to my knowledge the same concept
 Symfony serializer uses.
+
 
 Table of Contents
 -----------------
@@ -28,13 +29,15 @@ Getting Started
 Getting started is as easy as requiring the library with composer.
 
 ``` bash
-$ composer require bernard/normalt:~0.1
+$ composer require bernard/normalt
 ```
+
 
 Normalizers
 -----------
 
 Theese normalizers can be used with the serializer component directly or through the `AggregateNormalizer`.
+
 
 ### AggregateNormalizer
 
@@ -47,6 +50,7 @@ and use the first found.
 It implements a subset of the full serializer and its only focus is normalizing to arrays and
 denormalize arrays into objects. This lets you focus on normalization instead of converting
 into a specific format such as `xml`, `json` etc.
+
 
 #### Usage
 
@@ -95,6 +99,7 @@ echo $user->getName(); // outputs Henrik
 In contrast to the other normalizers in this package, it does __not__ make sense to use this with the 
 serializer as the Serializer already does most of the functionality already.
 
+
 ### DoctrineNormalizer
 
 `DoctrineNormalizer` normalizes mapped objects (Entities, Documents etc.) into arrays and back again.
@@ -116,6 +121,7 @@ $array = $normalizer->normalize($user);
 // using the same structure you can convert it back into a user
 $user = $normalizer->denormalize($array, null);
 ```
+
 
 ### RecursiveReflectionNormalizer
 
@@ -144,8 +150,8 @@ $array = $normalizer->normalize($profile);
 $profile = $normalize->denormalize($array, 'MyModel\Profile');
 ```
 
+
 License
 -------
 
 Please refer to the included `LICENSE` file.
-
