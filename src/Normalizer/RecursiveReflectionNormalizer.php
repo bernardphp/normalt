@@ -71,6 +71,7 @@ class RecursiveReflectionNormalizer extends AggregateNormalizer implements Aggre
     {
         switch (true) {
             case is_scalar($data):
+            case null === $data:
                 return $data;
 
             case is_array($data):
