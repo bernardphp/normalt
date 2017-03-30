@@ -40,7 +40,7 @@ class AggregateNormalizer implements NormalizerInterface, DenormalizerInterface,
             return $denormalizer->denormalize($data, $class, $format, $context);
         }
 
-        throw new UnexpectedValueException('No supported normalizer found for "' . $class . '".');
+        throw new UnexpectedValueException('No supported denormalizer found for "' . $class . '".');
     }
 
     public function supportsNormalization($data, $format = null)
